@@ -4,8 +4,8 @@ project(zcontainer VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(zcontainer 
-	main.cc
-	easylogging++.cc
-	container/container.cc
-)
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(BEFORE src)
+add_subdirectory(src)
+

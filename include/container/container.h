@@ -1,16 +1,9 @@
 #ifndef CONTAINER_CONTAINER_H
 #define CONTAINER_CONTAINER_H
 
-#include <cstddef>
-#include <iostream>
-#include <sched.h>
+#include "cgroups/cgroups_manager.h"
 #include <string>
-#include <sys/mount.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <cstdlib>
 #include <vector>
-#include "../easylogging++.h"
 
 namespace zcontainer {
 class Container {
@@ -22,15 +15,20 @@ public:
   Container(Container &&) = delete;
   Container &operator=(Container &&) = delete;
 
-	struct RunParams {
-		bool tty{false};
-		std::vector<std::string> cmds{};
-		int uid;
-		int gid;
-	};
-
+  struct RunParams {
+    bool tty{false};
+    std::vector<std::string> cmds{};
+    std::string mem{};
+    std::string cpu{};
+    std::string cpuset{};
+    int uid;
+    int gid;
+  };
 
   int RunContainer(const RunParams &params);
+
+private:
+  CgroupsManager cgroups_manager_;
 };
 }; // namespace zcontainer
 

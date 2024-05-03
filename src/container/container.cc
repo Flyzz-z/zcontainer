@@ -1,7 +1,11 @@
-#include "container.h"
+
+#include "container/container.h"
+#include "easylogging++.h"
+#include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <fcntl.h>
+#include <fstream>
 #include <sched.h>
 #include <string>
 #include <sys/mount.h>
@@ -21,35 +25,31 @@ int InitAndStartContainer(void *params) {
   }
 
   // 设置用户映射
-  FILE *uid_map = fopen("/proc/self/uid_map", "w");
-  if (uid_map == NULL) {
-    perror("open uid_map");
+  std::ofstream uid_map("/proc/self/uid_map");
+  if (uid_map.fail()) {
+    LOG(ERROR) << "open uid_map:" << strerror(errno);
     return EXIT_FAILURE;
   }
-  fprintf(uid_map, "0 %d 1",
-          run_params->uid); // 映射宿主系统的 root 用户到新的 user namespace
-  fclose(uid_map);
+  uid_map << "0 " << run_params->uid << " 1";
+  uid_map.close();
 
-  FILE *setgroups_file = fopen("/proc/self/setgroups", "w");
-  if (setgroups_file == NULL) {
-    perror("open setgroups");
+  std::ofstream setgroups("/proc/self/setgroups");
+  if (setgroups.fail()) {
+    LOG(ERROR) << "open setgroups:" << strerror(errno);
     return EXIT_FAILURE;
   }
 
-  // 写入"deny"到/setgroups文件
-  fprintf(setgroups_file, "deny");
-  // 关闭/setgroups文件
-  fclose(setgroups_file);
+  setgroups << "deny";
+  setgroups.close();
 
   // 设置组映射
-  FILE *gid_map = fopen("/proc/self/gid_map", "w");
-  if (gid_map == NULL) {
-    perror("open gid_map");
+  std::ofstream gid_map("/proc/self/gid_map");
+  if (gid_map.fail()) {
+    LOG(ERROR) << "open gid_map:" << strerror(errno);
     return EXIT_FAILURE;
   }
-  fprintf(gid_map, "0 %d 1",
-          run_params->gid); // 映射宿主系统的 root 组到新的 user namespace
-  fclose(gid_map);
+  gid_map << "0 " << run_params->gid << " 1";
+  gid_map.close();
 
   // 挂载操作，先将整个当前的挂载点设置为私有，避免外部影响
   if (mount("none", "/", NULL, MS_REC | MS_PRIVATE, NULL) == -1) {
@@ -113,10 +113,29 @@ int Container::RunContainer(const RunParams &params) {
     return EXIT_FAILURE;
   }
 
+  // 添加cgourp限制
+  Subsystem::ResourceConfig res;
+  if (!params.mem.empty()) {
+    res.memory_limit_in_bytes = params.mem;
+  }
+  if (!params.cpu.empty()) {
+    res.cpu_cfs_period_us = "100000";
+    res.cpu_cfs_quota_us = std::to_string(static_cast<int>(std::stof(params.cpu) * 100000));
+  }
+  if(!params.cpuset.empty()) {
+    res.cpuset_cpus = params.cpuset;
+	}
+
+
+  auto now = std::chrono::steady_clock::now();
+  std::string cgroup =
+      "zcontainer-" + std::to_string(now.time_since_epoch().count());
+  cgroups_manager_.ApplyCgroup(pid, cgroup, res);
+
   if (waitpid(pid, NULL, 0) == -1) {
     LOG(ERROR) << "waitpid error:" << strerror(errno);
   }
-
+	cgroups_manager_.RemoveCgroup(cgroup);
   return 0;
 }
 } // namespace zcontainer
