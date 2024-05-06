@@ -1,17 +1,15 @@
 #include "CLI11.hpp"
 #include "container/container.h"
 #include "easylogging++.h"
-#include <vector>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
 
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char **argv) {
   CLI::App app{"zcontainer - a toy container runtime written in C++"};
   app.require_subcommand(0, 1);
-
-  CLI::App *init_cmd = app.add_subcommand("init", "initialize the container");
 
   CLI::App *run_cmd =
       app.add_subcommand("run", "run a command in a new container");
@@ -31,9 +29,7 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
   // handle the subcommands
-  if (*init_cmd) {
-
-  } else if (*run_cmd) {
+  if (*run_cmd) {
     zcontainer::Container container;
     zcontainer::Container::RunParams run_params;
     run_params.tty = run_flag_tty;

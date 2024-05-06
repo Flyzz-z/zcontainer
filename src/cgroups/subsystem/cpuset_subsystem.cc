@@ -8,7 +8,6 @@ CpusetSubsystem::CpusetSubsystem()
 bool CpusetSubsystem::SetResourceLimit(const std::string &cgroup,
                                        const ResourceConfig &res) {
   if (res.cpuset_cpus.empty()) {
-    LOG(INFO) << "cpuset_cpus is empty";
     return false;
   }
 

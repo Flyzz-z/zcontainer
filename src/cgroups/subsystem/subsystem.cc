@@ -15,19 +15,29 @@ bool Subsystem::Create(const std::string &cgroup) {
 }
 
 bool Subsystem::Apply(int pid, const std::string &cgroup) {
-	std::string file_path = MountPrefix() + "/" + Name() + "/" + cgroup + "/tasks";
-	std::ofstream file(file_path);
-	if (!file) {
-		LOG(ERROR) << "open file " << file_path << " failed" << strerror(errno);
-		return false;
-	}
-	file << pid;
-	file.close();
-	return true;
+  std::string file_path =
+      MountPrefix() + "/" + Name() + "/" + cgroup + "/tasks";
+  std::ofstream file(file_path);
+  if (!file) {
+    LOG(ERROR) << "open file " << file_path << " failed" << strerror(errno);
+    return false;
+  }
+  file << pid;
+  file.close();
+  return true;
 }
 
 void Subsystem::Remove(const std::string &cgroup) {
-	std::string file_path = MountPrefix() + "/" + Name() + "/" + cgroup;
-	rmdir(file_path.c_str());
+  // 清空tasks
+  std::string file_path =
+      MountPrefix() + "/" + Name() + "/" + cgroup + "/tasks";
+  std::ofstream file(file_path);
+  if (file) {
+    file << "";
+    file.close();
+  }
+
+  file_path = MountPrefix() + "/" + Name() + "/" + cgroup;
+  rmdir(file_path.c_str());
 }
 }; // namespace zcontainer

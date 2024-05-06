@@ -15,7 +15,10 @@ public:
   Container(Container &&) = delete;
   Container &operator=(Container &&) = delete;
 
+	static const std::string CONTAINER_STORAGE_PATH;
+
   struct RunParams {
+		std::string container_id;
     bool tty{false};
     std::vector<std::string> cmds{};
     std::string mem{};
@@ -25,10 +28,11 @@ public:
     int gid;
   };
 
-  int RunContainer(const RunParams &params);
+  int RunContainer(RunParams &params);
 
 private:
   CgroupsManager cgroups_manager_;
+	std::string container_id_;
 };
 }; // namespace zcontainer
 

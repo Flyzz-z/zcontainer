@@ -15,8 +15,6 @@ bool CpuSubsystem::SetResourceLimit(const std::string &cgroup,
                                     const ResourceConfig &res) {
 
   if (res.cpu_cfs_period_us.empty() || res.cpu_cfs_quota_us.empty()) {
-    LOG(INFO) << "cpu_cfs_period_us or cpu_cfs_quota_us is empty"
-              << strerror(errno);
     return false;
   }
 

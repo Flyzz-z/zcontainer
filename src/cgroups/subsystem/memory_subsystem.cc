@@ -12,7 +12,6 @@ MemorySubsystem::MemorySubsystem()
 bool MemorySubsystem::SetResourceLimit(const std::string &cgroup,
                                        const ResourceConfig &res) {
   if (res.memory_limit_in_bytes.empty()) {
-    LOG(INFO) << "memory_limit_in_bytes is empty" << strerror(errno);
     return false;
   }
   std::string file_path =
