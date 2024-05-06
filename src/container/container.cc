@@ -175,7 +175,7 @@ int InitAndStartContainer(void *params) {
   }
 
   std::vector<char *> args;
-  for (int i = 1; i < run_params->cmds.size(); i++) {
+  for (int i = 0; i < run_params->cmds.size(); i++) {
     args.push_back(const_cast<char *>(run_params->cmds[i].c_str()));
   }
   args.push_back(nullptr); // 添加 NULL 结尾
