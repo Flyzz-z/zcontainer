@@ -173,14 +173,14 @@ int InitAndStartContainer(void *params) {
   args.push_back(nullptr); // 添加 NULL 结尾
 
   // 处理环境变量
-  std::vector<char*> envs;
+  std::vector<char *> envs;
   char **p_env = environ;
   for (; *p_env != nullptr; p_env++) {
     envs.push_back(*p_env);
   }
-	for (const auto &env : run_params->envs) {
-		envs.push_back(const_cast<char *>(env.c_str()));
-	}
+  for (const auto &env : run_params->envs) {
+    envs.push_back(const_cast<char *>(env.c_str()));
+  }
   envs.push_back(nullptr);
 
   if (execve(run_params->cmds[0].c_str(), args.data(), envs.data()) == -1) {
@@ -275,6 +275,25 @@ bool Container::ExecContainer(ExecParams &params) {
 
   int container_pid = container_json["pid"];
 
+  // 处理环境变量
+  std::vector<char *> envs;
+  char **p_env = environ;
+	for (; *p_env != NULL; p_env++) {
+		LOG(INFO) << *p_env;
+		envs.push_back(*p_env);
+	}
+
+  ifs.open("/proc/" + std::to_string(container_pid) + "/environ");
+  if (!ifs.is_open()) {
+    LOG(ERROR) << "open container environ file failed" << strerror(errno);
+    return false;
+  }
+  std::string container_env;
+  while (std::getline(ifs, container_env, '\0')) {
+    envs.push_back(const_cast<char *>(container_env.c_str()));
+  }
+  envs.push_back(nullptr);
+
   // 加入ns
   std::vector<std::string> ns_list = {"ipc", "pid", "uts", "net", "mnt"};
   for (const auto &ns : ns_list) {
@@ -293,7 +312,10 @@ bool Container::ExecContainer(ExecParams &params) {
     args.push_back(const_cast<char *>(params.cmds[i].c_str()));
   }
   args.push_back(nullptr); // 添加 NULL 结尾
-  execv(args[0], args.data());
+  if (execve(args[0], args.data(), envs.data()) == -1) {
+    LOG(ERROR) << "exec failed:" << strerror(errno);
+    return false;
+  }
   return true;
 }
 }; // namespace zcontainer
