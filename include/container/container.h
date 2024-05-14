@@ -20,16 +20,24 @@ public:
   struct RunParams {
 		std::string container_id;
     bool tty{false};
+		bool daemon{false};
     std::vector<std::string> cmds{};
     std::string mem{};
     std::string cpu{};
     std::string cpuset{};
-    int uid;
-    int gid;
+		std::vector<std::string> volumes;
+		std::vector<std::string> envs;
   };
 
-  int RunContainer(RunParams &params);
+	struct ExecParams {
+		std::string container_id;
+		bool tty{false};
+		std::vector<std::string> cmds;
+	};
 
+  int RunContainer(RunParams &params);
+	bool ExecContainer(ExecParams &params);
+	
 private:
   CgroupsManager cgroups_manager_;
 	std::string container_id_;
