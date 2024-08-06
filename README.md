@@ -64,5 +64,4 @@ Subcommands:
 
 使用Linux网桥，veth设备，iptables实现了如图所示网络:
 
-![img](./notes//assets/docker-bridge-network.png)****
-
+![img](./notes//assets/docker-bridge-network.png)

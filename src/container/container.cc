@@ -268,6 +268,10 @@ int Container::RunContainer(RunParams &params) {
       network_manager_.DisconnectFromNetwork(endpoint);
       remove(("/var/run/netns/" + container_id_).c_str());
     }
+    // TODO: 清理container和overlay
+    Utils::removeDirectories(Container::CONTAINER_STORAGE_PATH + "/overlay2/" +
+                             container_id_);
+    Utils::removeDirectories(container_path);
   }
   return 0;
 }
