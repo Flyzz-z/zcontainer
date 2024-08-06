@@ -1,6 +1,7 @@
 #include "container/container.h"
 #include "easylogging++.h"
 #include "json.hpp"
+#include "network/driver/endpoint.h"
 #include "utils.h"
 #include <chrono>
 #include <cstddef>
@@ -55,12 +56,12 @@ bool CreateNewFs(
     return false;
   }
 
-  if (mount(merged_path.c_str(), merged_path.c_str(), NULL, MS_BIND, NULL) ==
-      -1) {
-    LOG(ERROR) << "mount bind failed" << strerror(errno);
-    umount2(merged_path.c_str(), MNT_DETACH);
-    return false;
-  }
+  // if (mount(merged_path.c_str(), merged_path.c_str(), NULL, MS_BIND, NULL) ==
+  //     -1) {
+  //   LOG(ERROR) << "mount bind failed" << strerror(errno);
+  //   umount2(merged_path.c_str(), MNT_DETACH);
+  //   return false;
+  // }
 
   // 处理volume
   for (const auto &volume : volumes) {
@@ -247,11 +248,26 @@ int Container::RunContainer(RunParams &params) {
   std::string cgroup = "zc-" + container_id_ + "-" + std::to_string(pid);
   cgroups_manager_.ApplyCgroup(pid, cgroup, res);
 
+  Endpoint endpoint;
+  if (!params.network.empty()) {
+    std::string ln_src = "/proc/" + std::to_string(pid) + "/ns/net";
+    std::string ln_dest = "/var/run/netns/" + container_id_;
+    system(("ln -s " + ln_src + " " + ln_dest).c_str());
+    endpoint.id_ = params.container_id;
+    endpoint.container_pid_ = pid;
+    endpoint.port_mappings_ = params.port_mappings;
+    network_manager_.ConnectToNetwork(endpoint, params.network);
+  }
+
   if (!params.daemon) {
     if (waitpid(pid, NULL, 0) == -1) {
       LOG(ERROR) << "waitpid error:" << strerror(errno);
     }
     cgroups_manager_.RemoveCgroup(cgroup);
+    if (!params.network.empty()) {
+      network_manager_.DisconnectFromNetwork(endpoint);
+      remove(("/var/run/netns/" + container_id_).c_str());
+    }
   }
   return 0;
 }
@@ -278,10 +294,10 @@ bool Container::ExecContainer(ExecParams &params) {
   // 处理环境变量
   std::vector<char *> envs;
   char **p_env = environ;
-	for (; *p_env != NULL; p_env++) {
-		LOG(INFO) << *p_env;
-		envs.push_back(*p_env);
-	}
+  for (; *p_env != NULL; p_env++) {
+    LOG(INFO) << *p_env;
+    envs.push_back(*p_env);
+  }
 
   ifs.open("/proc/" + std::to_string(container_pid) + "/environ");
   if (!ifs.is_open()) {

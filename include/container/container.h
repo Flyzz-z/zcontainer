@@ -2,6 +2,7 @@
 #define CONTAINER_CONTAINER_H
 
 #include "cgroups/cgroups_manager.h"
+#include "network/network_manager.h"
 #include <string>
 #include <vector>
 
@@ -25,8 +26,10 @@ public:
     std::string mem{};
     std::string cpu{};
     std::string cpuset{};
+		std::string network{};
 		std::vector<std::string> volumes;
 		std::vector<std::string> envs;
+		std::vector<std::string> port_mappings;
   };
 
 	struct ExecParams {
@@ -40,6 +43,7 @@ public:
 	
 private:
   CgroupsManager cgroups_manager_;
+	NetworkManager network_manager_;
 	std::string container_id_;
 };
 }; // namespace zcontainer
