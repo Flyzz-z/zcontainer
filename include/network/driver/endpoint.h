@@ -19,7 +19,7 @@ public:
 		std::vector<std::string> port_mappings_;
 
 		std::string GetIfId() const {
-			return id_.substr(0, 5);
+			return id_.substr(0, 3) + std::to_string(container_pid_);
 		}
 };
 
