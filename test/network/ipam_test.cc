@@ -19,6 +19,7 @@ TEST(IPAMTest, BasicTest) {
   EXPECT_EQ(ipam.HasAllocated(ip_net, ip), false);
 }
 
+
 TEST(IPAMTest, MultiAllocTest) {
   IPAM ipam;
   IPNet ip_net("192.168.5.0/24");

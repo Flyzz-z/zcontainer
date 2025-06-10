@@ -10,6 +10,7 @@ lib: /usr/local/lib/
 
 ### 重定向tty
 
+
 ```c
   if (run_params->tty) {
 
