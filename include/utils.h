@@ -33,10 +33,10 @@ public:
   void static removeDirectories(const std::string &dirPath) {
     std::string command = "rm -rf " + dirPath;
     int status = system(command.c_str());
-		if(!WIFEXITED(status)) {
+    if (!WIFEXITED(status)) {
       LOG(ERROR) << "Failed to remove directory: " << dirPath;
     }
   }
 };
-};     // namespace zcontainer
+}; // namespace zcontainer
 #endif // UTILS_H

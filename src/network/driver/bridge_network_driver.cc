@@ -54,12 +54,13 @@ void BridgeNetworkDriver::Connect(const std::string &name, Endpoint &endpoint) {
   std::string alloc_ip = ipam.Allocate(network.ip_range_);
   std::string alloc_ip_net =
       alloc_ip + "/" + std::to_string(network.ip_range_.mask_size_);
-  LOG(INFO) << "container@" << endpoint.id_ << " alloc ip: " << alloc_ip_net <<'\n';
+  LOG(INFO) << "container@" << endpoint.id_ << " alloc ip: " << alloc_ip_net
+            << '\n';
 
   rtnl_manager_->SetLinkPidNamespace(endpoint.veth_.GetPeerName(),
                                      endpoint.container_pid_);
-	// 开启lo
-	rtnl_manager_->SetLinkUpNamespace("lo", endpoint.id_);
+  // 开启lo
+  rtnl_manager_->SetLinkUpNamespace("lo", endpoint.id_);
   rtnl_manager_->SetLinkIpNamespace(endpoint.veth_.GetPeerName(), alloc_ip_net,
                                     endpoint.id_);
   rtnl_manager_->SetLinkUpNamespace(endpoint.veth_.GetPeerName(), endpoint.id_);
@@ -97,13 +98,14 @@ void BridgeNetworkDriver::Disconnect(const std::string &name,
     std::string container_port = port_mapping.substr(pos + 1);
     std::string cmd = "iptables -t nat -D PREROUTING ! -i " + name +
                       " -p tcp -m tcp --dport " + host_port +
-                      " -j DNAT --to-destination " + endpoint.ip_addr_+ ":" +
+                      " -j DNAT --to-destination " + endpoint.ip_addr_ + ":" +
                       container_port;
     system(cmd.c_str());
 
     // output chain DNAT
     cmd = "iptables -t nat -D OUTPUT -p tcp -m tcp --dport " + host_port +
-          " -j DNAT --to-destination " + endpoint.ip_addr_ + ":" + container_port;
+          " -j DNAT --to-destination " + endpoint.ip_addr_ + ":" +
+          container_port;
     system(cmd.c_str());
   }
 }

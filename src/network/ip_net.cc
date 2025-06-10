@@ -32,6 +32,6 @@ std::string IPNet::GetNetwork() const {
 std::string IPNet::GetIP() const { return inet_ntoa(ip_); }
 
 std::string IPNet::GetSubnet() const {
-	return GetIP() + "/" + std::to_string(mask_size_);
+  return GetIP() + "/" + std::to_string(mask_size_);
 }
 }; // namespace zcontainer

@@ -32,11 +32,11 @@ int main(int argc, char **argv) {
   std::string run_option_mem;
   std::string run_option_cpu;
   std::string run_option_cpuset;
-	std::string run_option_net;
+  std::string run_option_net;
   std::vector<std::string> run_option_volumes;
   std::vector<std::string> run_option_envs;
   std::vector<std::string> run_option_cmds;
-	std::vector<std::string> run_option_ports;
+  std::vector<std::string> run_option_ports;
   run_cmd->add_flag("--it", run_flag_tty, "enable tty");
   run_cmd->add_flag("-d", run_flag_daemon, "run in background");
   run_cmd->add_option("--mem", run_option_mem, "memory limit");
@@ -46,9 +46,9 @@ int main(int argc, char **argv) {
       ->allow_extra_args(false);
   run_cmd->add_option("-e,--env", run_option_envs, "env")
       ->allow_extra_args(false);
-	run_cmd->add_option("-p,--port", run_option_ports, "port")
-			->allow_extra_args(false);
-	run_cmd->add_option("--net", run_option_net, "network");
+  run_cmd->add_option("-p,--port", run_option_ports, "port")
+      ->allow_extra_args(false);
+  run_cmd->add_option("--net", run_option_net, "network");
   run_cmd->add_option("cmd", run_option_cmds,
                       "command to run in the container");
   // TODO: 参数校验
@@ -98,10 +98,10 @@ int main(int argc, char **argv) {
     run_params.mem = run_option_mem;
     run_params.cpu = run_option_cpu;
     run_params.cpuset = run_option_cpuset;
-		run_params.network = run_option_net; 
+    run_params.network = run_option_net;
     run_params.volumes = run_option_volumes;
     run_params.envs = run_option_envs;
-		run_params.port_mappings = run_option_ports;
+    run_params.port_mappings = run_option_ports;
     run_params.cmds = run_option_cmds;
     container.RunContainer(run_params);
   } else if (*exec_cmd) {

@@ -68,30 +68,32 @@ void IPRTNLManager::SetLinkPidNamespace(const std::string &link, int pid) {
   }
 }
 
-void IPRTNLManager::SetLinkUpNamespace(const std::string &link, const std::string &ns) {
-  std::string cmd =
-      "ip netns exec " + ns + " ip link set " + link + " up";
+void IPRTNLManager::SetLinkUpNamespace(const std::string &link,
+                                       const std::string &ns) {
+  std::string cmd = "ip netns exec " + ns + " ip link set " + link + " up";
   if (system(cmd.c_str()) < 0) {
     throw std::runtime_error("Failed to set link up in pid namespace");
   }
 }
 
 void IPRTNLManager::SetLinkIpNamespace(const std::string &link,
-                                          const std::string &ip_net, const std::string &ns) {
-  std::string cmd = "ip netns exec " + ns + " ip addr add " +
-                    ip_net + " dev " + link;
+                                       const std::string &ip_net,
+                                       const std::string &ns) {
+  std::string cmd =
+      "ip netns exec " + ns + " ip addr add " + ip_net + " dev " + link;
   if (system(cmd.c_str()) < 0) {
     throw std::runtime_error("Failed to set link ip in pid namespace");
   }
 }
 
-void IPRTNLManager::AddDefaultRouteNamespace(const std::string &link,const std::string &route_ip,const std::string &ns) {
-	std::string cmd = "ip netns exec " + ns + " ip route add default via " + route_ip + " dev " + link;
-	if (system(cmd.c_str()) < 0) {
-		throw std::runtime_error("Failed to add default route in pid namespace");
-	}
+void IPRTNLManager::AddDefaultRouteNamespace(const std::string &link,
+                                             const std::string &route_ip,
+                                             const std::string &ns) {
+  std::string cmd = "ip netns exec " + ns + " ip route add default via " +
+                    route_ip + " dev " + link;
+  if (system(cmd.c_str()) < 0) {
+    throw std::runtime_error("Failed to add default route in pid namespace");
+  }
 }
-
-
 
 } // namespace zcontainer

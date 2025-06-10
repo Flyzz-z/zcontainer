@@ -16,35 +16,35 @@ public:
   Container(Container &&) = delete;
   Container &operator=(Container &&) = delete;
 
-	static const std::string CONTAINER_STORAGE_PATH;
+  static const std::string CONTAINER_STORAGE_PATH;
 
   struct RunParams {
-		std::string container_id;
+    std::string container_id;
     bool tty{false};
-		bool daemon{false};
+    bool daemon{false};
     std::vector<std::string> cmds{};
     std::string mem{};
     std::string cpu{};
     std::string cpuset{};
-		std::string network{};
-		std::vector<std::string> volumes;
-		std::vector<std::string> envs;
-		std::vector<std::string> port_mappings;
+    std::string network{};
+    std::vector<std::string> volumes;
+    std::vector<std::string> envs;
+    std::vector<std::string> port_mappings;
   };
 
-	struct ExecParams {
-		std::string container_id;
-		bool tty{false};
-		std::vector<std::string> cmds;
-	};
+  struct ExecParams {
+    std::string container_id;
+    bool tty{false};
+    std::vector<std::string> cmds;
+  };
 
   int RunContainer(RunParams &params);
-	bool ExecContainer(ExecParams &params);
-	
+  bool ExecContainer(ExecParams &params);
+
 private:
   CgroupsManager cgroups_manager_;
-	NetworkManager network_manager_;
-	std::string container_id_;
+  NetworkManager network_manager_;
+  std::string container_id_;
 };
 }; // namespace zcontainer
 

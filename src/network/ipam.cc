@@ -23,12 +23,12 @@ const std::string IPAM::IPAM_FILE_PATH =
     "/var/lib/zcontainer/network/ipam.json";
 
 IPAM::IPAM() {
-	if (access(IPAM_FILE_PATH.c_str(), F_OK) == -1) {
-		std::ofstream ofs(IPAM_FILE_PATH);
-		nlohmann::json j = *this;
-		ofs << j.dump(4);
-		ofs.close();
-	}
+  if (access(IPAM_FILE_PATH.c_str(), F_OK) == -1) {
+    std::ofstream ofs(IPAM_FILE_PATH);
+    nlohmann::json j = *this;
+    ofs << j.dump(4);
+    ofs.close();
+  }
 }
 
 std::string IPAM::Allocate(const IPNet &ip_net) {
@@ -40,9 +40,9 @@ std::string IPAM::Allocate(const IPNet &ip_net) {
   std::string network = ip_net.GetNetwork();
   if (!ip_map_.count(network)) {
     std::string bitmap(ip_net.Size(), '0');
-		// 主机地址全0保留用于网络地址，全1为广播地址
-		bitmap[0] = '1';
-		bitmap.back() = '1';
+    // 主机地址全0保留用于网络地址，全1为广播地址
+    bitmap[0] = '1';
+    bitmap.back() = '1';
     ip_map_[ip_net.GetNetwork()] = bitmap;
   }
   // 分配一个ip地址，设置对应网段的ip地址已分配
@@ -54,7 +54,7 @@ std::string IPAM::Allocate(const IPNet &ip_net) {
       inet_aton(ip_net.GetNetwork().c_str(), &ip_addr);
       ip_addr.s_addr += htonl(i);
       alloc_ip = inet_ntoa(ip_addr);
-			break; 
+      break;
     }
   }
 
@@ -90,7 +90,7 @@ bool IPAM::Load() {
   // 读取json
   std::ifstream ifs(IPAM_FILE_PATH);
   if (!ifs.is_open()) {
-		LOG(ERROR) << "open ipam file failed" << strerror(errno);
+    LOG(ERROR) << "open ipam file failed" << strerror(errno);
     return false;
   }
 

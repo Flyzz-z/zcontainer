@@ -92,11 +92,11 @@ Endpoint NetworkManager::ConnectToNetwork(Endpoint &endpoint,
 }
 
 void NetworkManager::DisconnectFromNetwork(Endpoint &endpoint) {
-	for (auto &network_driver : drivers_) {
-		if (network_driver->GetName() == endpoint.network_.driver_) {
-			network_driver->Disconnect(endpoint.network_.name_, endpoint);
-			break;
-		}
-	}
+  for (auto &network_driver : drivers_) {
+    if (network_driver->GetName() == endpoint.network_.driver_) {
+      network_driver->Disconnect(endpoint.network_.name_, endpoint);
+      break;
+    }
+  }
 }
 } // namespace zcontainer
